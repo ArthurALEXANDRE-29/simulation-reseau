@@ -4,12 +4,9 @@
 #include "adresse.h"
 #include "graphe.h"
 #include "trame.h"
-<<<<<<< HEAD
 #include "station.h"
 #include "switch.h"
 #include "configuration.h"
-=======
->>>>>>> b8a1f7fb5a1d050879ad73cb8861b8421ab5747d
 
 // Fonctions utilitaires pour les tests
 void test_separator(const char* test_name) {
@@ -211,12 +208,6 @@ void test_configuration() {
         result = charger_configuration("test_config_invalid.txt", &g);
         printf("Résultat du chargement: %s\n", result ? "Succès" : "Échec (attendu)");
     }
-    
-    // Nettoyage des fichiers de test
-    printf("\nNettoyage des fichiers de test...\n");
-    remove("test_config.txt");
-    remove("test_config_invalid.txt");
-    printf("Fichiers de test supprimés\n");
 }
 
 int main() {
