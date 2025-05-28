@@ -19,7 +19,7 @@ static const size_t UNKNOWN_INDEX = -1;
 
 void init_IPv4(IPv4 *adresse);
 void init_MAC(IPv4 *adresse);
-char * mac_to_string(MAC M, char * str_mac);
+char * MAC_to_string(MAC M, char * str_mac);
 
 char afficher_IPv4(const IPv4 *adresse);
 char afficher_MAC(const MAC *adresse);

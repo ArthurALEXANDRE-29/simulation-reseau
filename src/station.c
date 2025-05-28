@@ -3,8 +3,8 @@
 
 void afficher_station(station_t s) {
     printf("Station - MAC: ");
-    afficher_mac(s.mac);
+    afficher_MAC(&s.mac);
     printf(" | IP: ");
-    afficher_ip(s.ip);
+    afficher_IPv4(&s.ip);
     printf("\n");
 }
