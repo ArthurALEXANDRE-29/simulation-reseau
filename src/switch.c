@@ -79,6 +79,7 @@ void afficher_table_commutation(const table_commutation_t *table) {
     
     for (int i = 0; i < table->taille; i++) {
         printf("  - MAC: ");
+<<<<<<< HEAD
         afficher_mac(table->entrees[i].mac);
         printf(" -> Port: %d\n", table->entrees[i].port);
     }
@@ -93,6 +94,18 @@ void init_switch(switch_t *sw) {
     sw->priorite = 0;
     init_table_commutation(&sw->table);
     sw->ports = NULL;
+=======
+        afficher_MAC(&table.entrees[i].mac);
+        printf(" -> Port: %d\n", table.entrees[i].port);
+    }
+}
+
+void afficher_switch(switch_t s) {
+    printf("Switch - MAC: ");
+    afficher_MAC(&s.mac);
+    printf(" | Ports: %d | Priorité: %d\n", s.nb_ports, s.priorite);
+    afficher_table(s.table);
+>>>>>>> 1aa442e (Sauvegarde des modifications locales)
 }
 
 void deinit_switch(switch_t *sw) {

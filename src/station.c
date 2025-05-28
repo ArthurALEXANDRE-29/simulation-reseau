@@ -23,9 +23,15 @@ void afficher_station(const station_t *station) {
     }
     
     printf("Station - MAC: ");
+<<<<<<< HEAD
     afficher_mac(station->mac);
     printf(" | IP: ");
     afficher_ip(station->ip);
+=======
+    afficher_MAC(&s.mac);
+    printf(" | IP: ");
+    afficher_IPv4(&s.ip);
+>>>>>>> 1aa442e (Sauvegarde des modifications locales)
     printf("\n");
 }
 
