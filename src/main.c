@@ -4,9 +4,12 @@
 #include "adresse.h"
 #include "graphe.h"
 #include "trame.h"
+<<<<<<< HEAD
 #include "station.h"
 #include "switch.h"
 #include "configuration.h"
+=======
+>>>>>>> b8a1f7fb5a1d050879ad73cb8861b8421ab5747d
 
 // Fonctions utilitaires pour les tests
 void test_separator(const char* test_name) {
@@ -32,6 +35,7 @@ void test_adresses() {
         printf("MAC Broadcast: %s\n", str_mac);
     }
 }
+
 
 void test_graphe() {
     test_separator("Structure de graphe");
