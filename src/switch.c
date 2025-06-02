@@ -1,85 +1,43 @@
-#include "switch.h"
+#include "trame.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-
-void init_table_commutation(table_commutation_t *table) {
-    if (table == NULL) return;
-    
-    table->entrees = NULL;
-    table->taille = 0;
-    table->capacite = 0;
-}
-
-void deinit_table_commutation(table_commutation_t *table) {
-    if (table == NULL) return;
-    
-    free(table->entrees);
-    table->entrees = NULL;
-    table->taille = 0;
-    table->capacite = 0;
-}
-
-bool ajouter_entree_table(table_commutation_t *table, mac_addr_t mac, int port) {
-    if (table == NULL || port < 0) return false;
-    
-    for (int i = 0; i < table->taille; i++) {
-        if (mac_equals(table->entrees[i].mac, mac)) {
-            table->entrees[i].port = port;
-            return true;
-        }
+bool init_trame(trame *t, MAC src, MAC dest, uint16_t type, const uint8_t *donnees, size_t taille_donnees){
+    if(t == NULL || donnees == NULL){
+        return false;
     }
-    
-    if (table->taille >= table->capacite) {
-        int nouvelle_capacite = (table->capacite == 0) ? 8 : table->capacite * 2;
-        table_entree_t *nouvelles_entrees = realloc(table->entrees, 
-                                                     nouvelle_capacite * sizeof(table_entree_t));
-        if (nouvelles_entrees == NULL) return false;
-        
-        table->entrees = nouvelles_entrees;
-        table->capacite = nouvelle_capacite;
-    }
-    
-    table->entrees[table->taille].mac = mac;
-    table->entrees[table->taille].port = port;
-    table->taille++;
-    
+    t->source = src;
+    t->destination = dest;
+    t->type = type;
+    t->donnees = donnees;
+    t->taille_donnees = taille_donnees;
     return true;
 }
 
-int chercher_port_mac(const table_commutation_t *table, mac_addr_t mac) {
-    if (table == NULL) return -1;
-    
-    for (int i = 0; i < table->taille; i++) {
-        if (mac_equals(table->entrees[i].mac, mac)) {
-            return table->entrees[i].port;
-        }
-    }
-    
-    return -1; 
-}
-
-void vider_table_commutation(table_commutation_t *table) {
-    if (table == NULL) return;
-    table->taille = 0;
-}
-
-void afficher_table_commutation(const table_commutation_t *table) {
-    if (table == NULL) {
-        printf("Table de commutation: NULL\n");
+void afficher_trame(const trame *t){
+    if(t == NULL){
         return;
     }
-    
-    printf("Table de commutation (%d entrées):\n", table->taille);
-    if (table->taille == 0) {
-        printf("  (vide)\n");
+    char str_mac[18];
+    printf("Trame: %s\n", t->donnees);
+    MAC_to_string(t->source, str_mac);
+    printf("Source: %s\n", str_mac);
+    MAC_to_string(t->destination, str_mac);
+    printf("Destination: %s\n", str_mac);
+    printf("Type: %d\n", t->type);
+    printf("Taille: %zu\n", t->taille_donnees);
+    printf("FCS: %d\n", t->fcs);
+}
+
+void deinit_trame(trame *t){
+    if(t == NULL){
         return;
     }
+HEAD
     
     for (int i = 0; i < table->taille; i++) {
         printf("  - MAC: ");
-<<<<<<< HEAD
+HEAD
         afficher_mac(table->entrees[i].mac);
         printf(" -> Port: %d\n", table->entrees[i].port);
     }
@@ -94,7 +52,6 @@ void init_switch(switch_t *sw) {
     sw->priorite = 0;
     init_table_commutation(&sw->table);
     sw->ports = NULL;
-=======
         afficher_MAC(&table.entrees[i].mac);
         printf(" -> Port: %d\n", table.entrees[i].port);
     }
@@ -105,7 +62,6 @@ void afficher_switch(switch_t s) {
     afficher_MAC(&s.mac);
     printf(" | Ports: %d | Priorité: %d\n", s.nb_ports, s.priorite);
     afficher_table(s.table);
->>>>>>> 1aa442e (Sauvegarde des modifications locales)
 }
 
 void deinit_switch(switch_t *sw) {
@@ -227,4 +183,8 @@ const char* etat_port_to_string(etat_port_t etat) {
         case PORT_BLOQUE: return "BLOQUE";
         default: return "INVALIDE";
     }
+}
+    free(t->donnees);
+    t->donnees = NULL;
+    t->taille_donnees = 0;
 }
