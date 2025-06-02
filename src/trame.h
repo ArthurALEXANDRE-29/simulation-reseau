@@ -7,6 +7,9 @@
 #include "switch.h"
 
 #define TYPE_IPV4 0x0800
+#define TYPE_ARP  0x0806
+#define TYPE_IPV6 0x86DD
+#define TYPE_STP  0x0027
 
 typedef struct {
     uint8_t preambule[7];

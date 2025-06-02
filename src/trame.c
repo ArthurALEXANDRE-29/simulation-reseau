@@ -4,14 +4,26 @@
 #include <string.h>
 
 bool init_trame(trame *t, MAC src, MAC dest, uint16_t type, const uint8_t *donnees, size_t taille_donnees){
-    if(t == NULL || donnees == NULL){
+    if(t == NULL){
         return false;
     }
+    
     t->source = src;
     t->destination = dest;
     t->type = type;
-    t->donnees = donnees;
     t->taille_donnees = taille_donnees;
+    
+    if (donnees != NULL && taille_donnees > 0) {
+        t->donnees = malloc(taille_donnees);
+        if (t->donnees == NULL) {
+            return false;
+        }
+        memcpy(t->donnees, donnees, taille_donnees);
+    } else {
+        t->donnees = NULL;
+        t->taille_donnees = 0;
+    }
+    
     return true;
 }
 
