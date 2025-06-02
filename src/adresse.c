@@ -1,40 +1,4 @@
 #include "adresse.h"
-#include <stdio.h>
-
-
-void initIPv4(IPv4 *adresse){
-    //à completer
-}
-
-void initMAC(IPv4 *adresse){
-    //à completer
-}
-
-char afficherIPv4(const IPv4 *adresse){
-    //à completer
-}
-
-char afficherMAC(const MAC *adresse){
-    //à completer
-}
-
-char * IPv4_to_string(IPv4 ip, char * str_ipv4){
-    if (!str_ipv4){
-        return NULL;
-    }
-    snprintf(str_ipv4, 16, "%u.%u.%u.%u", ip.octet[0], ip.octet[1], ip.octet[2], ip.octet[3]);
-    return str_ipv4;
-}
-
-char * MAC_to_string(MAC M, char * str_mac){
-    if (!str_mac){ 
-        return NULL;
-    }
-    snprintf(str_mac, 18, "%02X:%02X:%02X:%02X:%02X:%02X", 
-             M.octet[0], M.octet[1], M.octet[2], M.octet[3], M.octet[4], M.octet[5]);
-    return str_mac;
-}
-#include "adresse.h"
 #include <string.h>
 
 void init_mac(mac_addr_t *mac) {
