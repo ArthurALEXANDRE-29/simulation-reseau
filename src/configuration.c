@@ -164,11 +164,15 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             continue;
         }
         
-        // Vérifier que les indices sont valides
-        if (equipement1 >= nombre_equipements || equipement2 >= nombre_equipements) {
-            fprintf(stderr, "Indice d'équipement invalide: %d ou %d\n", equipement1, equipement2);
+        // Vérifier que les indices correspondent aux sommets du graphe
+        if (equipement1 >= g->ordre || equipement2 >= g->ordre || equipement1 < 0 || equipement2 < 0) {
+            fprintf(stderr, "Indice d'équipement invalide pour le graphe: %d ou %d (graphe a %d sommets)\n", 
+                    equipement1, equipement2, g->ordre);
             continue;
         }
+        
+        // Debug pour voir ce qui se passe
+        printf("Ajout arête: %d -> %d\n", equipement1, equipement2);
         
         // Ajouter l'arête au graphe
         arete a = {equipement1, equipement2};
@@ -176,7 +180,6 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             fprintf(stderr, "Impossible d'ajouter l'arête entre %d et %d\n", equipement1, equipement2);
         }
     }
-    
     fclose(f);
     
     // Affichage des informations de la configuration chargée
