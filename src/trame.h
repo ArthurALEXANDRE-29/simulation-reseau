@@ -23,3 +23,4 @@ typedef struct {
 
 bool init_trame(trame *t, MAC src, MAC dest, uint16_t type, const uint8_t *donnees, size_t taille_donnees);
 void deinit_trame(trame *t);
+void afficher_trame(const trame *t);

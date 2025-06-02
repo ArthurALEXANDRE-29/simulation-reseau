@@ -14,6 +14,21 @@ bool init_trame(trame *t, MAC src, MAC dest, uint16_t type, const uint8_t *donne
     return true;
 }
 
+void afficher_trame(const trame *t){
+    if(t == NULL){
+        return;
+    }
+    char str_mac[18];
+    printf("Trame: %s\n", t->donnees);
+    MAC_to_string(t->source, str_mac);
+    printf("Source: %s\n", str_mac);
+    MAC_to_string(t->destination, str_mac);
+    printf("Destination: %s\n", str_mac);
+    printf("Type: %d\n", t->type);
+    printf("Taille: %zu\n", t->taille_donnees);
+    printf("FCS: %d\n", t->fcs);
+}
+
 void deinit_trame(trame *t){
     if(t == NULL){
         return;
