@@ -1,5 +1,6 @@
 #include "adresse.h"
-#include <stdio.h>
+HEAD
+a#include <stdio.h>
 
 
 void initIPv4(IPv4 *adresse){
@@ -35,6 +36,7 @@ char * MAC_to_string(MAC M, char * str_mac){
     return str_mac;
 }
 #include "adresse.h"
+
 #include <string.h>
 
 void init_mac(mac_addr_t *mac) {
