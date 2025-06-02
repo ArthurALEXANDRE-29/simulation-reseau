@@ -6,6 +6,8 @@
 #include "adresse.h"
 #include "switch.h"
 
+#define TYPE_IPV4 0x0800
+
 typedef struct {
     uint8_t preambule[7];
     uint8_t sfd;

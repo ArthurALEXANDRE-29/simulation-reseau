@@ -80,7 +80,7 @@ void afficher_ip(ip_addr_t ip) {
            ip.octet[0], ip.octet[1], ip.octet[2], ip.octet[3]);
 }
 
-char* mac_to_string(mac_addr_t mac, char *str_mac) {
+char* MAC_to_string(mac_addr_t mac, char *str_mac) {
     if (str_mac == NULL) return NULL;
     
     sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
