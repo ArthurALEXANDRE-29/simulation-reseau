@@ -114,8 +114,10 @@ switch_t creer_switch(mac_addr_t mac, int nb_ports, int priorite) {
     sw.ports = malloc(nb_ports * sizeof(port_info_t));
     if (sw.ports != NULL) {
         for (int i = 0; i < nb_ports; i++) {
-            sw.ports[i].etat = PORT_INCONNU;
+            sw.ports[i].state = PORT_DISABLED;
+            sw.ports[i].role = PORT_UNKNOWN;
             sw.ports[i].actif = false;
+            sw.ports[i].cost = 1; // Coût par défaut
         }
     }
     
@@ -135,8 +137,10 @@ void afficher_switch(const switch_t *sw) {
     if (sw->ports != NULL) {
         printf("État des ports:\n");
         for (int i = 0; i < sw->nb_ports; i++) {
-            printf("  Port %d: %s (%s)\n", i, 
-                   etat_port_to_string(sw->ports[i].etat),
+            printf("  Port %d: %s/%s (coût: %d, %s)\n", i, 
+                   port_state_to_string(sw->ports[i].state),
+                   port_role_to_string(sw->ports[i].role),
+                   sw->ports[i].cost,
                    sw->ports[i].actif ? "actif" : "inactif");
         }
     }
@@ -151,26 +155,44 @@ void init_ports(switch_t *sw) {
     sw->ports = malloc(sw->nb_ports * sizeof(port_info_t));
     if (sw->ports != NULL) {
         for (int i = 0; i < sw->nb_ports; i++) {
-            sw->ports[i].etat = PORT_INCONNU;
+            sw->ports[i].state = PORT_DISABLED;
+            sw->ports[i].role = PORT_UNKNOWN;
             sw->ports[i].actif = false;
+            sw->ports[i].cost = 1; // Coût par défaut
         }
     }
 }
 
-void set_etat_port(switch_t *sw, int port, etat_port_t etat) {
+void set_port_state(switch_t *sw, int port, port_state_t state) {
     if (sw == NULL || sw->ports == NULL || port < 0 || port >= sw->nb_ports) {
         return;
     }
     
-    sw->ports[port].etat = etat;
+    sw->ports[port].state = state;
 }
 
-etat_port_t get_etat_port(const switch_t *sw, int port) {
+port_state_t get_port_state(const switch_t *sw, int port) {
     if (sw == NULL || sw->ports == NULL || port < 0 || port >= sw->nb_ports) {
-        return PORT_INCONNU;
+        return PORT_DISABLED;
     }
     
-    return sw->ports[port].etat;
+    return sw->ports[port].state;
+}
+
+void set_port_role(switch_t *sw, int port, port_role_t role) {
+    if (sw == NULL || sw->ports == NULL || port < 0 || port >= sw->nb_ports) {
+        return;
+    }
+    
+    sw->ports[port].role = role;
+}
+
+port_role_t get_port_role(const switch_t *sw, int port) {
+    if (sw == NULL || sw->ports == NULL || port < 0 || port >= sw->nb_ports) {
+        return PORT_UNKNOWN;
+    }
+    
+    return sw->ports[port].role;
 }
 
 void activer_port(switch_t *sw, int port) {
@@ -206,12 +228,23 @@ bool switch_equals(const switch_t *s1, const switch_t *s2) {
            s1->priorite == s2->priorite;
 }
 
-const char* etat_port_to_string(etat_port_t etat) {
-    switch (etat) {
-        case PORT_INCONNU: return "INCONNU";
-        case PORT_RACINE: return "RACINE";
-        case PORT_DESIGNE: return "DESIGNE";
-        case PORT_BLOQUE: return "BLOQUE";
-        default: return "INVALIDE";
+const char* port_state_to_string(port_state_t state) {
+    switch (state) {
+        case PORT_DISABLED: return "DISABLED";
+        case PORT_BLOCKING: return "BLOCKING";
+        case PORT_LISTENING: return "LISTENING";
+        case PORT_LEARNING: return "LEARNING";
+        case PORT_FORWARDING: return "FORWARDING";
+        default: return "UNKNOWN";
+    }
+}
+
+const char* port_role_to_string(port_role_t role) {
+    switch (role) {
+        case PORT_UNKNOWN: return "UNKNOWN";
+        case PORT_ROOT: return "ROOT";
+        case PORT_DESIGNATED: return "DESIGNATED";
+        case PORT_BLOCKED: return "BLOCKED";
+        default: return "INVALID";
     }
 }
