@@ -232,7 +232,7 @@ void afficher_etat_stp(switch_stp_t *stp)
     
     printf("États des ports:\n");
     for (size_t i = 0; i < stp->sw->nb_ports; i++) {
-        printf("  Port %d: %s - %s\n", i,
+        printf("  Port %ld: %s - %s\n", i,
                port_role_to_string(get_port_role(stp->sw, i)),
                port_state_to_string(get_port_state(stp->sw, i)));
     }
