@@ -1,3 +1,15 @@
+/**
+ * Programme principal de simulation réseau
+ * 
+ * Ce fichier contient le programme principal qui simule un réseau
+ * commuté avec le protocole STP. Il permet de :
+ * - Créer une topologie de test
+ * - Initialiser les switches et stations
+ * - Exécuter le protocole STP
+ * - Simuler l'envoi de trames
+ * - Afficher l'état du réseau
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +22,15 @@
 #include "trame.h"
 #include "station.h"
 
-// Structure pour simuler des stations connectées aux switches
+/**
+ * Structure pour simuler des stations connectées aux switches
+ * 
+ * Cette structure étend la structure station_t avec des informations
+ * sur la connexion physique au réseau :
+ * - nom : identifiant lisible de la station
+ * - switch_id : identifiant du switch connecté
+ * - port_connecte : numéro du port sur le switch
+ */
 typedef struct {
     station_t station;
     char nom[32];
@@ -18,7 +38,14 @@ typedef struct {
     int port_connecte;
 } station_connectee_t;
 
-// Fonction pour créer une topologie de test (triangle de switches)
+/**
+ * Crée une topologie de test en forme de triangle
+ * 
+ * Cette fonction crée une topologie simple avec 3 switches
+ * connectés en triangle, utilisée pour tester le protocole STP.
+ * 
+ * Retourne un pointeur vers le graphe créé, NULL en cas d'erreur
+ */
 graphe* creer_topologie_triangle() {
     graphe *g = malloc(sizeof(graphe));
     if (!g) return NULL;
@@ -42,7 +69,15 @@ graphe* creer_topologie_triangle() {
     return g;
 }
 
-// Fonction pour initialiser les switches de test
+/**
+ * Initialise les switches de test
+ * 
+ * Cette fonction initialise 3 switches avec des priorités
+ * différentes pour tester la sélection de la racine STP :
+ * - Switch 0 : priorité haute (100)
+ * - Switch 1 : priorité moyenne (200)
+ * - Switch 2 : priorité basse (300)
+ */
 void init_switches_test(switch_t switches[], int nb_switches) {
     // Switch 0 - Priorité haute (sera probablement root)
     switches[0] = creer_switch(creer_mac(0x00, 0x01, 0x02, 0x03, 0x04, 0x05), 3, 100);
@@ -62,7 +97,15 @@ void init_switches_test(switch_t switches[], int nb_switches) {
     }
 }
 
-// Fonction pour créer des stations de test
+/**
+ * Initialise les stations de test
+ * 
+ * Cette fonction initialise 3 stations connectées à des
+ * switches différents pour tester la communication :
+ * - Station A : connectée au switch 0
+ * - Station B : connectée au switch 1
+ * - Station C : connectée au switch 2
+ */
 void init_stations_test(station_connectee_t stations[], int nb_stations) {
     // Station A connectée au switch 0, port 0
     stations[0].station = creer_station(
@@ -92,7 +135,14 @@ void init_stations_test(station_connectee_t stations[], int nb_stations) {
     stations[2].port_connecte = 0;
 }
 
-// Fonction pour afficher l'état du réseau après STP
+/**
+ * Affiche l'état du réseau après l'exécution de STP
+ * 
+ * Cette fonction affiche de manière formatée :
+ * - Les informations de chaque switch
+ * - L'état et le rôle de chaque port
+ * - La table de commutation de chaque switch
+ */
 void afficher_etat_reseau(switch_t switches[], int nb_switches, graphe *g) {
     printf("\n╔══════════════════════════════════════════════════════════════╗\n");
     printf("║                    ÉTAT DU RÉSEAU APRÈS STP                  ║\n");
@@ -125,7 +175,16 @@ void afficher_etat_reseau(switch_t switches[], int nb_switches, graphe *g) {
     }
 }
 
-// Fonction pour simuler l'envoi d'une trame dans le réseau
+/**
+ * Simule l'envoi d'une trame dans le réseau
+ * 
+ * Cette fonction simule le traitement d'une trame par un switch :
+ * 1. Création de la trame
+ * 2. Vérification de l'état du port d'entrée
+ * 3. Apprentissage de l'adresse source
+ * 4. Recherche de l'adresse destination
+ * 5. Décision de forwarding (unicast, broadcast ou flood)
+ */
 void simuler_envoi_trame(switch_t switches[], int nb_switches, graphe *g,
                         MAC src_mac, MAC dst_mac, const char* message,
                         int switch_entree, int port_entree) {
@@ -225,7 +284,18 @@ void simuler_envoi_trame(switch_t switches[], int nb_switches, graphe *g,
     deinit_trame(&t);
 }
 
-// Fonction principale de simulation
+/**
+ * Fonction principale du programme
+ * 
+ * Cette fonction :
+ * 1. Crée une topologie de test
+ * 2. Initialise les switches et stations
+ * 3. Exécute le protocole STP
+ * 4. Affiche l'état du réseau
+ * 5. Simule l'envoi de trames
+ * 
+ * Retourne 0 en cas de succès, 1 en cas d'erreur
+ */
 int main() {
     printf("╔════════════════════════════════════════════════════════════════╗\n");
     printf("║              SIMULATION DE RÉSEAU AVEC STP                     ║\n");
