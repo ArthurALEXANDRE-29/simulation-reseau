@@ -63,7 +63,7 @@ static arete swap_sommets(arete a){
 bool existe_arete(graphe const *g, arete a)
 {
     // retourne true si l'arête a est contenue dans le graphe g, false sinon
-    for(int i = 0; i < g->nb_aretes; i++){
+    for(size_t i = 0; i < g->nb_aretes; i++){
         if ((g->aretes[i].s1 == a.s1 && g->aretes[i].s2 == a.s2) || (g->aretes[i].s1 == a.s2 && g->aretes[i].s2 == a.s1)){
             return true;
     }
@@ -119,7 +119,7 @@ size_t index_arete(graphe const *g, arete a)
     // retourne l'index de l'arête au sein du tableau d'arêtes de g si l'arête a existe dans g,
     // la valeur UNKNOWN_INDEX sinon
     if(existe_arete(g, a) == true || existe_arete(g, swap_sommets(a)) == true){
-        for(int i = 0; i < g->nb_aretes;i++){
+        for(size_t i = 0; i < g->nb_aretes;i++){
             if ((g->aretes[i].s1 == a.s1 && g->aretes[i].s2 == a.s2) || (g->aretes[i].s1 == a.s2 && g->aretes[i].s2 == a.s1)){
                 return i;
             }
@@ -134,8 +134,8 @@ size_t sommets_adjacents(graphe const *g, sommet s, sommet sa[])
     // et retourne le nombre de sommets ainsi stockés
     // (on suppose que s fait bien partie du graphe g)
     // (le tableau sa est supposé assez grand pour contenir les sommets adjacents de s)
-    int index = 0;
-    for(int i = 0; i < g->nb_aretes; i++){
+    size_t index = 0;
+    for(size_t i = 0; i < g->nb_aretes; i++){
         if(g->aretes[i].s1 == s){
             sa[index] = g->aretes[i].s2;  // Le sommet adjacent
             index++;

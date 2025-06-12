@@ -20,7 +20,7 @@ void init_stp(switch_stp_t *stp, switch_t *sw)
     stp->sw = sw;
     
     // Initialiser tous les ports en état BLOCKING par défaut
-    for (int i = 0; i < sw->nb_ports; i++) {
+    for (size_t i = 0; i < sw->nb_ports; i++) {
         set_port_state(sw, i, PORT_BLOCKING);
         set_port_role(sw, i, PORT_UNKNOWN);
     }
@@ -34,7 +34,7 @@ void deinit_stp(switch_stp_t *stp)
     
     // Désactiver tous les ports
     if (stp->sw) {
-        for (int i = 0; i < stp->sw->nb_ports; i++) {
+        for (size_t i = 0; i < stp->sw->nb_ports; i++) {
             set_port_state(stp->sw, i, PORT_DISABLED);
         }
     }
@@ -45,7 +45,7 @@ void deinit_stp(switch_stp_t *stp)
 // Compare deux adresses MAC (retourne -1 si mac1 < mac2, 0 si égales, 1 si mac1 > mac2)
 int comparer_mac(mac_addr_t mac1, mac_addr_t mac2)
 {
-    for (int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < 6; i++) {
         if (mac1.octet[i] < mac2.octet[i]) return -1;
         if (mac1.octet[i] > mac2.octet[i]) return 1;
     }
@@ -60,7 +60,7 @@ bool bpdu_est_meilleur(switch_stp_t *stp, bpdu_t *bpdu)
     if (bpdu->root_priority > stp->root_priority) return false;
     
     // Si même priorité, comparer par MAC de racine
-    int cmp_root = comparer_mac(bpdu->root_mac, stp->root_mac);
+    size_t cmp_root = comparer_mac(bpdu->root_mac, stp->root_mac);
     if (cmp_root < 0) return true;
     if (cmp_root > 0) return false;
     
@@ -112,7 +112,7 @@ void recalculer_roles_ports(switch_stp_t *stp)
     if (mac_equals(stp->root_mac, stp->sw->mac) && stp->root_priority == stp->sw->priorite) {
         stp->root_port = -1;
         // Tous les ports sont designated
-        for (int i = 0; i < stp->sw->nb_ports; i++) {
+        for (size_t i = 0; i < stp->sw->nb_ports; i++) {
             set_port_role(stp->sw, i, PORT_DESIGNATED);
             set_port_state(stp->sw, i, PORT_FORWARDING);
         }
@@ -120,7 +120,7 @@ void recalculer_roles_ports(switch_stp_t *stp)
     }
     
     // Pour les autres switches
-    for (int i = 0; i < stp->sw->nb_ports; i++) {
+    for (size_t i = 0; i < stp->sw->nb_ports; i++) {
         if (i == stp->root_port) {
             // Port racine déjà configuré
             continue;
@@ -168,15 +168,15 @@ void calculer_stp_simple(switch_stp_t switches[], size_t nb_switches, graphe con
     switches[racine_idx].root_cost = 0;
     switches[racine_idx].root_port = -1;
     
-    for (int p = 0; p < switches[racine_idx].sw->nb_ports; p++) {
+    for (size_t p = 0; p < switches[racine_idx].sw->nb_ports; p++) {
         set_port_role(switches[racine_idx].sw, p, PORT_DESIGNATED);
         set_port_state(switches[racine_idx].sw, p, PORT_FORWARDING);
     }
     
     // Phase 3: Simuler la propagation des BPDUs
     bool changement = true;
-    int iterations = 0;
-    const int max_iterations = 10; // Éviter les boucles infinies
+    size_t iterations = 0;
+    const size_t max_iterations = 10; // Éviter les boucles infinies
     
     while (changement && iterations < max_iterations) {
         changement = false;
@@ -231,7 +231,7 @@ void afficher_etat_stp(switch_stp_t *stp)
     printf("Port racine: %d\n", stp->root_port);
     
     printf("États des ports:\n");
-    for (int i = 0; i < stp->sw->nb_ports; i++) {
+    for (size_t i = 0; i < stp->sw->nb_ports; i++) {
         printf("  Port %d: %s - %s\n", i,
                port_role_to_string(get_port_role(stp->sw, i)),
                port_state_to_string(get_port_state(stp->sw, i)));

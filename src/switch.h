@@ -39,9 +39,9 @@ typedef struct {
     port_role_t role;
     bool actif;
     int cost;
-    // Autres informations STP si nécessaire
 } port_info_t;
 
+// Structure pour un switch
 typedef struct {
     mac_addr_t mac;
     int nb_ports;

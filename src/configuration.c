@@ -166,7 +166,7 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
         
         // Vérifier que les indices correspondent aux sommets du graphe
         if (equipement1 >= g->ordre || equipement2 >= g->ordre || equipement1 < 0 || equipement2 < 0) {
-            fprintf(stderr, "Indice d'équipement invalide pour le graphe: %d ou %d (graphe a %d sommets)\n", 
+            fprintf(stderr, "Indice d'équipement invalide pour le graphe: %d ou %d (graphe a %ld sommets)\n", 
                     equipement1, equipement2, g->ordre);
             continue;
         }
