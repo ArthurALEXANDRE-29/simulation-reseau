@@ -1,3 +1,12 @@
+/**
+ * Implémentation du protocole Spanning Tree Protocol (STP)
+ * 
+ * Ce fichier contient l'implémentation du protocole STP qui permet d'éviter
+ * les boucles dans un réseau commuté en créant un arbre couvrant.
+ * Il gère la sélection de la racine, les états des ports et la propagation
+ * des BPDUs (Bridge Protocol Data Units).
+ */
+
 #include "stp.h"
 #include "switch.h"
 #include "graphe.h"
@@ -6,6 +15,14 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * Initialise la structure STP d'un switch
+ * 
+ * Cette fonction initialise les paramètres STP d'un switch :
+ * - Définit le switch comme racine initiale
+ * - Initialise tous les ports en état BLOCKING
+ * - Configure les coûts et priorités par défaut
+ */
 void init_stp(switch_stp_t *stp, switch_t *sw) 
 {
     if (!stp || !sw) {
@@ -26,6 +43,12 @@ void init_stp(switch_stp_t *stp, switch_t *sw)
     }
 }
 
+/**
+ * Désinitialise la structure STP d'un switch
+ * 
+ * Cette fonction désactive tous les ports du switch et nettoie
+ * la structure STP avant sa destruction.
+ */
 void deinit_stp(switch_stp_t *stp) 
 {
     if (!stp) {
@@ -42,7 +65,13 @@ void deinit_stp(switch_stp_t *stp)
     stp->sw = NULL;
 }
 
-// Compare deux adresses MAC (retourne -1 si mac1 < mac2, 0 si égales, 1 si mac1 > mac2)
+/**
+ * Compare deux adresses MAC
+ * 
+ * Cette fonction compare octet par octet deux adresses MAC
+ * pour déterminer leur ordre lexicographique.
+ * Retourne -1 si mac1 < mac2, 0 si égales, 1 si mac1 > mac2
+ */
 int comparer_mac(mac_addr_t mac1, mac_addr_t mac2)
 {
     for (size_t i = 0; i < 6; i++) {
@@ -52,7 +81,17 @@ int comparer_mac(mac_addr_t mac1, mac_addr_t mac2)
     return 0;
 }
 
-// Détermine si un BPDU est meilleur que les informations actuelles
+/**
+ * Détermine si un BPDU est meilleur que les informations actuelles
+ * 
+ * Cette fonction implémente l'algorithme de comparaison des BPDUs
+ * selon les critères du protocole STP :
+ * 1. Priorité de racine
+ * 2. MAC de racine
+ * 3. Coût vers la racine
+ * 4. Priorité de l'expéditeur
+ * 5. MAC de l'expéditeur
+ */
 bool bpdu_est_meilleur(switch_stp_t *stp, bpdu_t *bpdu)
 {
     // Comparer par priorité de racine
@@ -76,7 +115,15 @@ bool bpdu_est_meilleur(switch_stp_t *stp, bpdu_t *bpdu)
     return comparer_mac(bpdu->sender_mac, stp->sw->mac) < 0;
 }
 
-// Traite un BPDU reçu sur un port
+/**
+ * Traite un BPDU reçu sur un port
+ * 
+ * Cette fonction traite un BPDU reçu en :
+ * - Ajoutant le coût du lien au coût annoncé
+ * - Comparant avec les informations actuelles
+ * - Mettant à jour la configuration si nécessaire
+ * - Recalculant les rôles des ports
+ */
 void traiter_bpdu(switch_stp_t *stp, int port, bpdu_t *bpdu)
 {
     if (!stp || !bpdu || port < 0 || port >= stp->sw->nb_ports) {
@@ -103,7 +150,13 @@ void traiter_bpdu(switch_stp_t *stp, int port, bpdu_t *bpdu)
     }
 }
 
-// Recalcule les rôles de tous les ports
+/**
+ * Recalcule les rôles de tous les ports
+ * 
+ * Cette fonction détermine le rôle de chaque port :
+ * - Si le switch est racine, tous les ports sont designated
+ * - Sinon, le port racine est conservé et les autres sont bloqués
+ */
 void recalculer_roles_ports(switch_stp_t *stp)
 {
     if (!stp || !stp->sw) return;
@@ -133,7 +186,12 @@ void recalculer_roles_ports(switch_stp_t *stp)
     }
 }
 
-// Crée un BPDU à envoyer
+/**
+ * Crée un BPDU à envoyer
+ * 
+ * Cette fonction crée un BPDU contenant les informations
+ * actuelles du switch pour la propagation dans le réseau.
+ */
 bpdu_t creer_bpdu(switch_stp_t *stp)
 {
     bpdu_t bpdu;
@@ -145,7 +203,15 @@ bpdu_t creer_bpdu(switch_stp_t *stp)
     return bpdu;
 }
 
-// Calcule le STP pour un ensemble de switches connectés
+/**
+ * Calcule le STP pour un ensemble de switches connectés
+ * 
+ * Cette fonction implémente l'algorithme STP complet :
+ * 1. Sélection de la racine
+ * 2. Configuration initiale
+ * 3. Propagation des BPDUs
+ * 4. Finalisation des rôles des ports
+ */
 void calculer_stp_simple(switch_stp_t switches[], size_t nb_switches, graphe const *g)
 {
     if (!switches || nb_switches == 0 || !g) {
@@ -215,7 +281,14 @@ void calculer_stp_simple(switch_stp_t switches[], size_t nb_switches, graphe con
     }
 }
 
-// Affiche l'état STP d'un switch
+/**
+ * Affiche l'état STP d'un switch
+ * 
+ * Cette fonction affiche de manière formatée :
+ * - Les informations de base du switch
+ * - Les informations de racine
+ * - L'état et le rôle de chaque port
+ */
 void afficher_etat_stp(switch_stp_t *stp)
 {
     if (!stp || !stp->sw) return;

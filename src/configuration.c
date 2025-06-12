@@ -1,3 +1,12 @@
+/**
+ * Gestion de la configuration réseau
+ * 
+ * Ce fichier contient les fonctions permettant de charger et gérer
+ * la configuration d'un réseau à partir d'un fichier texte.
+ * Il gère la lecture des équipements (switches et stations) et
+ * des liens entre eux.
+ */
+
 #include "configuration.h"
 #include "station.h"
 #include "switch.h"
@@ -11,9 +20,19 @@
 
 /**
  * Charge la configuration réseau à partir d'un fichier
- * @param nom_fichier Nom du fichier de configuration
- * @param g Pointeur vers le graphe à remplir
- * @return 1 si le chargement a réussi, 0 sinon
+ * 
+ * Cette fonction lit un fichier de configuration au format suivant :
+ * - Première ligne : nombre d'équipements et nombre de liens
+ * - Lignes suivantes : description des équipements
+ *   - Format switch : 2;MAC;nb_ports;priorite
+ *   - Format station : 1;MAC;IP
+ * - Dernières lignes : description des liens
+ *   - Format : equipement1;equipement2;poids
+ * 
+ * Le fichier est parsé ligne par ligne et les structures
+ * correspondantes sont créées et initialisées.
+ * 
+ * Retourne 1 si le chargement a réussi, 0 sinon
  */
 int charger_configuration(const char *nom_fichier, graphe *g) {
     FILE *f = fopen(nom_fichier, "r");
