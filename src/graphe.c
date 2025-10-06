@@ -47,8 +47,10 @@ size_t index_sommet(graphe const *g, sommet s)
 {
     // retourne l'index du sommet s dans le graphe g
     // la valeur UNKNOWN_INDEX si le sommet n'existe pas dans g
-    if (s < g->ordre) {
-        return s;
+    for(int i = 0; i < g->ordre; i++){
+        if(s == i){
+            return i;
+        }
     }
     return UNKNOWN_INDEX;
 }
@@ -63,7 +65,7 @@ static arete swap_sommets(arete a){
 bool existe_arete(graphe const *g, arete a)
 {
     // retourne true si l'arête a est contenue dans le graphe g, false sinon
-    for(size_t i = 0; i < g->nb_aretes; i++){
+    for(int i = 0; i < g->nb_aretes; i++){
         if ((g->aretes[i].s1 == a.s1 && g->aretes[i].s2 == a.s2) || (g->aretes[i].s1 == a.s2 && g->aretes[i].s2 == a.s1)){
             return true;
     }
@@ -78,20 +80,16 @@ bool ajouter_arete(graphe *g, arete a)
         return false;
     // l'arête a n'est ajoutée que si les conditions suivantes sont remplies :
     //  - les sommets s1 et s2 de a existent dans g
-    if (g == NULL)
-        return false;
-    
-    // Vérifier que les sommets existent dans g
     if (a.s1 >= g->ordre || a.s2 >= g->ordre)
         return false;
-    
-    // Vérifier que les sommets sont distincts
+    //  - les sommets s1 et s2 de a sont distincts
     if (a.s1 == a.s2)
         return false;
-    
-    // Vérifier que l'arête n'existe pas déjà
-    // (existe_arete vérifie déjà les deux sens)
+    //  - l'arête a n'existe pas dans g
     if(existe_arete(g, a)){
+        return false;
+    }
+    if(existe_arete(g, swap_sommets(a))){
         return false;
     }
     // /!\ si la capacité actuelle du tableau d'arêtes n'est pas suffisante,
@@ -105,8 +103,6 @@ bool ajouter_arete(graphe *g, arete a)
         g->aretes = nouveau_tableau;
         g->aretes_capacite = nouvelle_capacite;
     }
-    
-    // Ajouter l'arête
     g->aretes[g->nb_aretes] = a;
     g->nb_aretes++;
     return true;
@@ -119,7 +115,7 @@ size_t index_arete(graphe const *g, arete a)
     // retourne l'index de l'arête au sein du tableau d'arêtes de g si l'arête a existe dans g,
     // la valeur UNKNOWN_INDEX sinon
     if(existe_arete(g, a) == true || existe_arete(g, swap_sommets(a)) == true){
-        for(size_t i = 0; i < g->nb_aretes;i++){
+        for(int i = 0; i < g->nb_aretes;i++){
             if ((g->aretes[i].s1 == a.s1 && g->aretes[i].s2 == a.s2) || (g->aretes[i].s1 == a.s2 && g->aretes[i].s2 == a.s1)){
                 return i;
             }
@@ -134,15 +130,15 @@ size_t sommets_adjacents(graphe const *g, sommet s, sommet sa[])
     // et retourne le nombre de sommets ainsi stockés
     // (on suppose que s fait bien partie du graphe g)
     // (le tableau sa est supposé assez grand pour contenir les sommets adjacents de s)
-    size_t index = 0;
-    for(size_t i = 0; i < g->nb_aretes; i++){
+    int index = 0;
+    for(int i = 0; i < g->nb_aretes; i++){
         if(g->aretes[i].s1 == s){
-            sa[index] = g->aretes[i].s2;  // Le sommet adjacent
-            index++;
+            sa[index] = g->aretes[i].s1;
+            index ++;
         }
-        if(g->aretes[i].s2 == s){
-            sa[index] = g->aretes[i].s1;  // Le sommet adjacent
-            index++;
+        if(g-> aretes[i].s2 == s){
+            sa[index] = g->aretes[i].s2;
+            index ++;
         }
     }
     return index;

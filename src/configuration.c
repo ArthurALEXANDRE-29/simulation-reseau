@@ -1,12 +1,3 @@
-/**
- * Gestion de la configuration réseau
- * 
- * Ce fichier contient les fonctions permettant de charger et gérer
- * la configuration d'un réseau à partir d'un fichier texte.
- * Il gère la lecture des équipements (switches et stations) et
- * des liens entre eux.
- */
-
 #include "configuration.h"
 #include "station.h"
 #include "switch.h"
@@ -18,22 +9,11 @@
 //sscanf permet de recup des infos avec une chaine formatée
 //sprintf permet de formater une chaine dans un char *
 
-
 /**
  * Charge la configuration réseau à partir d'un fichier
- * 
- * Cette fonction lit un fichier de configuration au format suivant :
- * - Première ligne : nombre d'équipements et nombre de liens
- * - Lignes suivantes : description des équipements
- *   - Format switch : 2;MAC;nb_ports;priorite
- *   - Format station : 1;MAC;IP
- * - Dernières lignes : description des liens
- *   - Format : equipement1;equipement2;poids
- * 
- * Le fichier est parsé ligne par ligne et les structures
- * correspondantes sont créées et initialisées.
- * 
- * Retourne 1 si le chargement a réussi, 0 sinon
+ * @param nom_fichier Nom du fichier de configuration
+ * @param g Pointeur vers le graphe à remplir
+ * @return 1 si le chargement a réussi, 0 sinon
  */
 int charger_configuration(const char *nom_fichier, graphe *g) {
     FILE *f = fopen(nom_fichier, "r");
@@ -42,16 +22,12 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
         return 0;
     }
     
-    char *ligne = NULL;
-    size_t taille_ligne = 0;
-    size_t longueur;
+    char ligne[MAX_LIGNE];
     int nombre_equipements, nombre_liens;
     
     // Lecture de la ligne d'en-tête (nb_equipements nb_liens)
-    if ((longueur = getline(&ligne, &taille_ligne, f)) == -1 || 
-        sscanf(ligne, "%d %d", &nombre_equipements, &nombre_liens) != 2) {
+    if (fgets(ligne, MAX_LIGNE, f) == NULL || sscanf(ligne, "%d %d", &nombre_equipements, &nombre_liens) != 2) {
         fprintf(stderr, "Format de la première ligne incorrect\n");
-        free(ligne);
         fclose(f);
         return 0;
     }
@@ -67,7 +43,6 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
         fprintf(stderr, "Erreur d'allocation mémoire\n");
         free(switchs);
         free(stations);
-        free(ligne);
         fclose(f);
         return 0;
     }
@@ -77,11 +52,10 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
     
     // Lecture des équipements
     for (int i = 0; i < nombre_equipements; i++) {
-        if ((longueur = getline(&ligne, &taille_ligne, f)) == -1) {
+        if (fgets(ligne, MAX_LIGNE, f) == NULL) {
             fprintf(stderr, "Fin de fichier inattendue\n");
             free(switchs);
             free(stations);
-            free(ligne);
             fclose(f);
             return 0;
         }
@@ -179,7 +153,7 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
     
     // Lecture des liens
     for (int i = 0; i < nombre_liens; i++) {
-        if ((longueur = getline(&ligne, &taille_ligne, f)) == -1) {
+        if (fgets(ligne, MAX_LIGNE, f) == NULL) {
             fprintf(stderr, "Fin de fichier inattendue lors de la lecture des liens\n");
             break;
         }
@@ -190,15 +164,11 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             continue;
         }
         
-        // Vérifier que les indices correspondent aux sommets du graphe
-        if (equipement1 >= g->ordre || equipement2 >= g->ordre || equipement1 < 0 || equipement2 < 0) {
-            fprintf(stderr, "Indice d'équipement invalide pour le graphe: %d ou %d (graphe a %ld sommets)\n", 
-                    equipement1, equipement2, g->ordre);
+        // Vérifier que les indices sont valides
+        if (equipement1 >= nombre_equipements || equipement2 >= nombre_equipements) {
+            fprintf(stderr, "Indice d'équipement invalide: %d ou %d\n", equipement1, equipement2);
             continue;
         }
-        
-        // Debug pour voir ce qui se passe
-        printf("Ajout arête: %d -> %d\n", equipement1, equipement2);
         
         // Ajouter l'arête au graphe
         arete a = {equipement1, equipement2};
@@ -206,7 +176,7 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             fprintf(stderr, "Impossible d'ajouter l'arête entre %d et %d\n", equipement1, equipement2);
         }
     }
-    free(ligne);
+    
     fclose(f);
     
     // Affichage des informations de la configuration chargée
@@ -243,6 +213,7 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
     return 1;
 }
 
+<<<<<<< HEAD
 /**
  * Charge la configuration réseau depuis un fichier et crée les structures
  * 
@@ -450,3 +421,5 @@ void liberer_configuration(configuration_reseau_t *config) {
         free(config->g);
     }
 }
+=======
+>>>>>>> 45889d9 (Remove merge mark)
