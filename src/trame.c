@@ -138,7 +138,7 @@ uint32_t calculer_fcs(const trame *t) {
 }
 
 /**
- * Vérifie si une adresse MAC est une adresse de broadcast
+ * Vérifie si une adresse MAC est une adresse de broadcast 
  * Une adresse broadcast contient uniquement des 0xFF
  */
 bool est_broadcast(MAC mac) {
