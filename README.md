@@ -40,13 +40,13 @@ Simulation d’une architecture réseau locale en C : switches, stations, trames
 ## 🚀 Installation & Exécution (version simplifiée)
 ```bash
 git clone https://github.com/ArthurALEXANDRE-29/simulation-reseau.git
-cd simulation-reseau
+cd simulation-reseau/src
 make
-./simulation src/exemple_reseau.txt
+./main exemple_reseau.txt
 ```
 Autre (ex: config existante) :
 ```bash
-./simulation src/config1.txt
+./main config1.txt
 ```
 
 Nettoyage :
@@ -150,11 +150,11 @@ Local network simulation in C: switches, hosts, frame structures, MAC learning a
 ## 🚀 Quick Setup
 ```bash
 make
-./simulation src/exemple_reseau.txt
+./main src/exemple_reseau.txt
 ```
 Other sample:
 ```bash
-./simulation src/config1.txt
+./main config1.txt
 ```
 Cleanup:
 ```bash
