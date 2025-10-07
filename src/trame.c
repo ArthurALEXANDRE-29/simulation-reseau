@@ -22,7 +22,6 @@ void deinit_trame(trame *t){
     t->donnees = NULL;
     t->taille_donnees = 0;
 }
-<<<<<<< HEAD
 
 /**
  * Calcule le FCS (Frame Check Sequence) d'une trame
@@ -57,5 +56,3 @@ bool est_broadcast(MAC mac) {
     }
     return true;
 }
-=======
->>>>>>> 45889d9 (Remove merge mark)
