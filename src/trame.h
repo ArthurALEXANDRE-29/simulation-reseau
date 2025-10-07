@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "adresse.h"
+#include "switch.h"
+
+#define TYPE_IPV4 0x0800
+#define TYPE_ARP  0x0806
+#define TYPE_IPV6 0x86DD
+#define TYPE_STP  0x0027
 
 typedef struct {
     uint8_t preambule[7];
@@ -16,10 +22,11 @@ typedef struct {
     uint32_t fcs;
 } trame;
 
-#define TYPE_IPV4 0x0800
-#define TYPE_ARP  0x0806
-#define TYPE_IPV6 0x86DD
-#define TYPE_STP  0x0027
 
 bool init_trame(trame *t, MAC src, MAC dest, uint16_t type, const uint8_t *donnees, size_t taille_donnees);
 void deinit_trame(trame *t);
+void afficher_trame(const trame *t);
+void envoyer_trame(trame *t, switch_t *sw);
+void envoyer_trame_sur_port(trame *t, int port);
+uint32_t calculer_fcs(const trame *t);
+bool est_broadcast(MAC mac);

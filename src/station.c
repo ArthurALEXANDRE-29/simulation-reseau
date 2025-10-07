@@ -8,6 +8,7 @@
  */
 void init_station(station_t *station) {
     if (station == NULL) return;
+    
     init_mac(&station->mac);
     init_ip(&station->ip);
 }
@@ -32,6 +33,7 @@ void afficher_station(const station_t *station) {
         printf("Station: NULL\n");
         return;
     }
+    
     printf("Station - MAC: ");
     afficher_mac(station->mac);
     printf(" | IP: ");
@@ -45,6 +47,7 @@ void afficher_station(const station_t *station) {
  */
 bool station_equals(const station_t *s1, const station_t *s2) {
     if (s1 == NULL || s2 == NULL) return false;
+    
     return mac_equals(s1->mac, s2->mac) && ip_equals(s1->ip, s2->ip);
 }
 
@@ -54,6 +57,7 @@ bool station_equals(const station_t *s1, const station_t *s2) {
  */
 void copier_station(station_t *dest, const station_t *src) {
     if (dest == NULL || src == NULL) return;
+    
     dest->mac = src->mac;
     dest->ip = src->ip;
 }

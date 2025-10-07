@@ -1,3 +1,12 @@
+/**
+ * Gestion de la configuration réseau
+ * 
+ * Ce fichier contient les fonctions permettant de charger et gérer
+ * la configuration d'un réseau à partir d'un fichier texte.
+ * Il gère la lecture des équipements (switches et stations) et
+ * des liens entre eux.
+ */
+
 #include "configuration.h"
 #include "station.h"
 #include "switch.h"
@@ -11,9 +20,19 @@
 
 /**
  * Charge la configuration réseau à partir d'un fichier
- * @param nom_fichier Nom du fichier de configuration
- * @param g Pointeur vers le graphe à remplir
- * @return 1 si le chargement a réussi, 0 sinon
+ * 
+ * Cette fonction lit un fichier de configuration au format suivant :
+ * - Première ligne : nombre d'équipements et nombre de liens
+ * - Lignes suivantes : description des équipements
+ *   - Format switch : 2;MAC;nb_ports;priorite
+ *   - Format station : 1;MAC;IP
+ * - Dernières lignes : description des liens
+ *   - Format : equipement1;equipement2;poids
+ * 
+ * Le fichier est parsé ligne par ligne et les structures
+ * correspondantes sont créées et initialisées.
+ * 
+ * Retourne 1 si le chargement a réussi, 0 sinon
  */
 int charger_configuration(const char *nom_fichier, graphe *g) {
     FILE *f = fopen(nom_fichier, "r");
@@ -164,11 +183,15 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             continue;
         }
         
-        // Vérifier que les indices sont valides
-        if (equipement1 >= nombre_equipements || equipement2 >= nombre_equipements) {
-            fprintf(stderr, "Indice d'équipement invalide: %d ou %d\n", equipement1, equipement2);
+        // Vérifier que les indices correspondent aux sommets du graphe
+        if (equipement1 >= g->ordre || equipement2 >= g->ordre || equipement1 < 0 || equipement2 < 0) {
+            fprintf(stderr, "Indice d'équipement invalide pour le graphe: %d ou %d (graphe a %ld sommets)\n", 
+                    equipement1, equipement2, g->ordre);
             continue;
         }
+        
+        // Debug pour voir ce qui se passe
+        printf("Ajout arête: %d -> %d\n", equipement1, equipement2);
         
         // Ajouter l'arête au graphe
         arete a = {equipement1, equipement2};
@@ -176,7 +199,6 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
             fprintf(stderr, "Impossible d'ajouter l'arête entre %d et %d\n", equipement1, equipement2);
         }
     }
-    
     fclose(f);
     
     // Affichage des informations de la configuration chargée
@@ -213,213 +235,3 @@ int charger_configuration(const char *nom_fichier, graphe *g) {
     return 1;
 }
 
-<<<<<<< HEAD
-/**
- * Charge la configuration réseau depuis un fichier et crée les structures
- * 
- * Cette fonction étend charger_configuration() pour également créer
- * les structures switch_t et station_t nécessaires à la simulation
- */
-int charger_configuration_complete(const char *nom_fichier, configuration_reseau_t *config) {
-    FILE *f = fopen(nom_fichier, "r");
-    if (!f) {
-        perror("Erreur d'ouverture du fichier");
-        return 0;
-    }
-    
-    char *ligne = NULL;
-    size_t taille_ligne = 0;
-    size_t longueur;
-    int nombre_equipements, nombre_liens;
-    
-    // Lecture de la ligne d'en-tête
-    if ((longueur = getline(&ligne, &taille_ligne, f)) == -1 || 
-        sscanf(ligne, "%d %d", &nombre_equipements, &nombre_liens) != 2) {
-        fprintf(stderr, "Format de la première ligne incorrect\n");
-        free(ligne);
-        fclose(f);
-        return 0;
-    }
-    
-    // Initialisation du graphe
-    config->g = malloc(sizeof(graphe));
-    if (!config->g) {
-        fclose(f);
-        return 0;
-    }
-    init_graphe(config->g);
-    
-    // Allocation des tableaux
-    config->switches = malloc(nombre_equipements * sizeof(switch_t));
-    config->stations = malloc(nombre_equipements * sizeof(station_t));
-    
-    if (!config->switches || !config->stations) {
-        fprintf(stderr, "Erreur d'allocation mémoire\n");
-        free(config->switches);
-        free(config->stations);
-        free(config->g);
-        free(ligne);
-        fclose(f);
-        return 0;
-    }
-    
-    config->nb_switches = 0;
-    config->nb_stations = 0;
-    
-    // Lecture des équipements
-    for (int i = 0; i < nombre_equipements; i++) {
-        if ((longueur = getline(&ligne, &taille_ligne, f)) == -1) {
-            fprintf(stderr, "Fin de fichier inattendue\n");
-            free(config->switches);
-            free(config->stations);
-            free(config->g);
-            free(ligne);
-            fclose(f);
-            return 0;
-        }
-        
-        int type_equipement;
-        char *token = strtok(ligne, ";");
-        if (token == NULL || sscanf(token, "%d", &type_equipement) != 1) {
-            fprintf(stderr, "Format incorrect pour le type d'équipement\n");
-            continue;
-        }
-        
-        // Ajout d'un sommet dans le graphe
-        ajouter_sommet(config->g);
-        
-        switch (type_equipement) {
-            case 2: { // Switch
-                MAC mac;
-                int nb_ports;
-                unsigned int priorite;
-                
-                // Lecture MAC
-                token = strtok(NULL, ";");
-                if (token == NULL) {
-                    fprintf(stderr, "Format incorrect pour l'adresse MAC du switch\n");
-                    continue;
-                }
-                sscanf(token, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", 
-                       &mac.octet[0], &mac.octet[1], &mac.octet[2], 
-                       &mac.octet[3], &mac.octet[4], &mac.octet[5]);
-                
-                // Lecture nombre de ports
-                token = strtok(NULL, ";");
-                if (token == NULL || sscanf(token, "%d", &nb_ports) != 1) {
-                    fprintf(stderr, "Format incorrect pour le nombre de ports\n");
-                    continue;
-                }
-                
-                // Lecture priorité
-                token = strtok(NULL, ";");
-                if (token == NULL || sscanf(token, "%u", &priorite) != 1) {
-                    fprintf(stderr, "Format incorrect pour la priorité\n");
-                    continue;
-                }
-                
-                // Création du switch
-                config->switches[config->nb_switches] = creer_switch(mac, nb_ports, priorite);
-                
-                // Activer tous les ports avec coût 10
-                for (int p = 0; p < nb_ports; p++) {
-                    activer_port(&config->switches[config->nb_switches], p);
-                    config->switches[config->nb_switches].ports[p].cost = 10;
-                }
-                
-                config->nb_switches++;
-                break;
-            }
-            case 1: { // Station
-                MAC mac;
-                IPv4 ip;
-                
-                // Lecture MAC
-                token = strtok(NULL, ";");
-                if (token == NULL) {
-                    fprintf(stderr, "Format incorrect pour l'adresse MAC de la station\n");
-                    continue;
-                }
-                sscanf(token, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", 
-                       &mac.octet[0], &mac.octet[1], &mac.octet[2], 
-                       &mac.octet[3], &mac.octet[4], &mac.octet[5]);
-                
-                // Lecture IP
-                token = strtok(NULL, ";");
-                if (token == NULL) {
-                    fprintf(stderr, "Format incorrect pour l'adresse IP\n");
-                    continue;
-                }
-                sscanf(token, "%hhu.%hhu.%hhu.%hhu", 
-                       &ip.octet[0], &ip.octet[1], &ip.octet[2], &ip.octet[3]);
-                
-                // Création de la station
-                config->stations[config->nb_stations] = creer_station(mac, ip);
-                config->nb_stations++;
-                break;
-            }
-            default:
-                fprintf(stderr, "Type d'équipement inconnu: %d\n", type_equipement);
-                break;
-        }
-    }
-    
-    // Lecture des liens
-    for (int i = 0; i < nombre_liens; i++) {
-        if ((longueur = getline(&ligne, &taille_ligne, f)) == -1) {
-            fprintf(stderr, "Fin de fichier inattendue lors de la lecture des liens\n");
-            break;
-        }
-        
-        int equipement1, equipement2, poids;
-        if (sscanf(ligne, "%d;%d;%d", &equipement1, &equipement2, &poids) != 3) {
-            fprintf(stderr, "Format incorrect pour le lien: %s", ligne);
-            continue;
-        }
-        
-        // Vérifier la validité des indices
-        if (equipement1 >= config->g->ordre || equipement2 >= config->g->ordre || 
-            equipement1 < 0 || equipement2 < 0) {
-            fprintf(stderr, "Indice d'équipement invalide: %d ou %d\n", equipement1, equipement2);
-            continue;
-        }
-        
-        // Ajouter l'arête
-        arete a = {equipement1, equipement2};
-        if (!ajouter_arete(config->g, a)) {
-            fprintf(stderr, "Impossible d'ajouter l'arête entre %d et %d\n", equipement1, equipement2);
-        }
-    }
-    
-    free(ligne);
-    fclose(f);
-    
-    // Affichage de la configuration chargée
-    printf("Configuration réseau chargée avec succès:\n");
-    printf("- %d équipements (%d switches, %d stations)\n", 
-           nombre_equipements, config->nb_switches, config->nb_stations);
-    printf("- %zu liens\n", nb_aretes(config->g));
-    
-    return 1;
-}
-
-/**
- * Libère la mémoire allouée pour la configuration
- */
-void liberer_configuration(configuration_reseau_t *config) {
-    if (config->switches) {
-        for (int i = 0; i < config->nb_switches; i++) {
-            deinit_switch(&config->switches[i]);
-        }
-        free(config->switches);
-    }
-    if (config->stations) {
-        free(config->stations);
-    }
-    if (config->g) {
-        deinit_graphe(config->g);
-        free(config->g);
-    }
-}
-=======
->>>>>>> 45889d9 (Remove merge mark)
